@@ -1,0 +1,73 @@
+{
+  "name": "@elune/y2ts",
+  "version": "0.0.18",
+  "description": "gen yApi to typescript",
+  "type": "module",
+  "main": "./build/src/index.js",
+  "module": "./src/next.ts",
+  "types": "./typings/src/index.d.ts",
+  "files": [
+    "build",
+    "typings"
+  ],
+  "exports": {
+    "./build/*": "./build/*.js"
+  },
+  "engines": {
+    "node": ">=18.19.1"
+  },
+  "bin": {
+    "y2ts": "./build/src/cli.js"
+  },
+  "maintainers": [
+    {
+      "name": "qianyf"
+    }
+  ],
+  "publishConfig": {
+    "bin": {
+      "y2ts": "./build/src/cli.js"
+    },
+    "main": "./build/src/index.js",
+    "module": "./build/src/index.js",
+    "types": "./typings/src/index.d.ts",
+    "files": [
+      "build",
+      "typings"
+    ]
+  },
+  "scripts": {
+    "test": "vitest",
+    "n": "tsc -p node.tsconfig.json",
+    "declare": "tsc -p declare.tsconfig.json",
+    "build": "npm run clean && npm run n && npm run declare",
+    "clean": "rimraf build typings",
+    "upgrade:major": "pnpm version major",
+    "upgrade:minor": "pnpm version minor",
+    "upgrade:patch": "pnpm version patch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/json-schema": "^7.0.15",
+    "json-schema-to-typescript": "^13.1.2"
+  },
+  "devDependencies": {
+    "@types/node": "^18.17.0",
+    "@typescript-eslint/eslint-plugin": "^7.1.1",
+    "@typescript-eslint/parser": "^7.1.1",
+    "@vitest/coverage-istanbul": "^1.3.1",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-prettier": "^5.1.3",
+    "prettier": "^3.2.5",
+    "rimraf": "^5.0.5",
+    "tslib": "^2.6.2",
+    "typescript": "^5.4.2",
+    "vite": "^5.1.5",
+    "vitest": "^1.3.1"
+  }
+}
