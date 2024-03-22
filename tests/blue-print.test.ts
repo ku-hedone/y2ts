@@ -191,6 +191,7 @@ describe('blue print', () => {
       clean();
     });
   });
+
   describe('POST request with only responseBody (default)', () => {
     beforeAll(() => {
       api = createQueryURLConfig({
@@ -216,6 +217,53 @@ describe('blue print', () => {
 
     it("instance's response should not have a required property", () => {
       expect(instance!.response!.type!.required).toBeUndefined();
+    });
+    afterAll(() => {
+      clean();
+    });
+  });
+
+  describe('POST request with only responseBody (customization)', () => {
+    beforeAll(() => {
+      api = createQueryURLConfig({
+        title: 'POST request with only requestBody',
+        method: 'POST',
+        responseBody: {
+          values: [
+            {
+              type: 'string',
+            },
+            {
+              type: 'number',
+            },
+            {
+              type: 'boolean',
+            },
+            {
+              type: 'object',
+            },
+          ],
+          required: 3,
+        },
+        url: {},
+      });
+      instance = new BluePrint(api, '/prefix').instance;
+    });
+
+    it('instance should not have request property', () => {
+      expect(instance!.request).toBeUndefined();
+    });
+
+    it('instance should have a response property', () => {
+      expect(instance!.response).toBeDefined();
+    });
+
+    it('instance should have 4 response body fields', () => {
+      expect(Reflect.ownKeys(instance!.response!.type.properties!)).toHaveLength(4);
+    });
+
+    it("instance's response should have 3 required properties", () => {
+      expect(instance!.response!.type!.required).toHaveLength(3);
     });
     afterAll(() => {
       clean();
