@@ -1,4 +1,4 @@
-import { RequestBodyType, RequestFormItemType, RequiredStatus, ResponseBodyType } from './constant';
+import { RequestFormItemType, RequiredStatus } from './constant';
 import type { JSONSchema4 } from 'json-schema';
 
 interface OriginalRequestHeader {
@@ -13,16 +13,16 @@ interface OriginalRequestHeader {
   /** 是否必需 */
   required: RequiredStatus;
 }
-interface OriginalRequestParam {
+export interface OriginalPathVariable {
   _id: string;
   /** 名称 */
   name: string;
   /** 备注 */
   desc?: string;
   /** 示例 */
-  example: string;
+  example?: string;
 }
-interface OriginalRequestQuery {
+export interface OriginalRequestQuery {
   _id: string;
   /** 名称 */
   name: string;
@@ -47,8 +47,39 @@ interface OriginalRequestBodyForm {
   required: RequiredStatus;
 }
 
-/** 接口定义 */
-export interface Api {
+export type BodyType = 'json' | 'text' | 'xml' | 'raw';
+
+interface PathVariables {
+  req_params: OriginalPathVariable[];
+}
+
+interface QueryParameters {
+  req_query: OriginalRequestQuery[];
+}
+interface RequestBody {
+  /** 仅 POST：请求内容类型。为 text, file, raw 时不必特殊处理。 */
+  req_body_type?: BodyType;
+  /** `req_body_type = json` 时是否为 json schema */
+  req_body_is_json_schema: boolean;
+  /** `req_body_type = form` 时的请求内容 */
+  req_body_form: OriginalRequestBodyForm[];
+  /** `req_body_type = json` 时的请求内容 */
+  req_body_other?: string;
+}
+interface ResponseBody {
+  /** `req_body_type = json` 时的请求内容 */
+  req_body_other?: string;
+  /** 返回数据类型 */
+  res_body_type: BodyType;
+  /** `res_body_type = json` 时是否为 json schema */
+  res_body_is_json_schema?: boolean;
+  /** 返回数据 */
+  res_body: string;
+}
+/**
+ * base HTTP
+ */
+export interface ApiBase {
   /** 接口 ID */
   _id: number;
   /** 接口名称 */
@@ -61,55 +92,140 @@ export interface Api {
   path: string;
   /** 请求方式，HEAD、OPTIONS 处理与 GET 相似，其余处理与 POST 相似 */
   method: string;
-  /** 所属项目 id */
-  project_id: number;
-  /** 所属分类 id */
-  catid: number;
   /** 标签列表 */
   tag: string[];
+  /** 所属项目 id */
+  // project_id: number;
+  /** 所属分类 id */
+  // catid: number;
+  /** 创建时间（unix时间戳） */
+  // add_time: number;
+  /** 更新时间（unix时间戳） */
+  // up_time: number;
+  /** 创建人 ID */
+  // uid: number;
   /** 请求头 */
   req_headers: OriginalRequestHeader[];
-  /** 路径参数 */
-  req_params: OriginalRequestParam[];
-  req_query: OriginalRequestQuery[];
-  /** 仅 POST：请求内容类型。为 text, file, raw 时不必特殊处理。 */
-  req_body_type?: RequestBodyType;
-  /** `req_body_type = json` 时是否为 json schema */
-  req_body_is_json_schema: boolean;
-  /** `req_body_type = form` 时的请求内容 */
-  req_body_form: OriginalRequestBodyForm[];
-  /** `req_body_type = json` 时的请求内容 */
-  req_body_other?: string;
-  /** 返回数据类型 */
-  res_body_type: ResponseBodyType;
-  /** `res_body_type = json` 时是否为 json schema */
-  res_body_is_json_schema: boolean;
-  /** 返回数据 */
-  res_body: string;
-  /** 创建时间（unix时间戳） */
-  add_time: number;
-  /** 更新时间（unix时间戳） */
-  up_time: number;
-  /** 创建人 ID */
-  uid: number;
 }
+/**
+ * HTTP with PathVariables
+ */
+export interface ApiWithPathVariables extends ApiBase, PathVariables {}
+/**
+ * HTTP with QueryParameters
+ */
+export interface ApiWithQueryParameters extends ApiBase, QueryParameters {}
+/**
+ * HTTP with PathVariables, QueryParameters
+ */
+export interface ApiWithPathVariablesQueryParameters
+  extends ApiBase,
+    PathVariables,
+    QueryParameters {}
+/**
+ * HTTP with RequestBody
+ */
+export interface ApiWithRequestBody extends ApiBase, RequestBody {}
+/**
+ * HTTP with PathVariables, RequestBody
+ */
+export interface ApiWithPathVariablesRequestBody
+  extends ApiWithPathVariables,
+    RequestBody {}
+/**
+ * HTTP with QueryParameters, RequestBody
+ */
+export interface ApiWithQueryParametersRequestBody
+  extends ApiWithQueryParameters,
+    RequestBody {}
+/**
+ * HTTP with PathVariables, QueryParameters, RequestBody
+ */
+export interface ApiWithPathVariablesQueryParametersRequestBody
+  extends ApiWithPathVariablesQueryParameters,
+    RequestBody {}
+/**
+ * HTTP  ResponseBody
+ */
+export interface ApiWithResponseBody extends ApiBase, ResponseBody {}
+/**
+ * HTTP with PathVariables, ResponseBody
+ */
+export interface ApiWithPathVariablesResponseBody
+  extends ApiWithPathVariables,
+    ResponseBody {}
+/**
+ * HTTP with QueryParameters, ResponseBody
+ */
+export interface ApiWithQueryParametersResponseBody
+  extends ApiWithQueryParameters,
+    ResponseBody {}
+/**
+ * HTTP with RequestBody, ResponseBody
+ */
+export interface ApiWithRequestBodyResponseBody
+  extends ApiWithRequestBody,
+    ResponseBody {}
+/**
+ * HTTP with PathVariables, QueryParameters, ResponseBody
+ */
+export interface ApiWithPathVariablesQueryParametersResponseBody
+  extends ApiWithPathVariablesQueryParameters,
+    ResponseBody {}
+/**
+ * HTTP with PathVariables, RequestBody, ResponseBody
+ */
+export interface ApiWithPathVariablesRequestBodyResponseBody
+  extends ApiWithPathVariablesRequestBody,
+    ResponseBody {}
+/**
+ * HTTP with QueryParameters, RequestBody, ResponseBody
+ */
+export interface ApiWithQueryParametersRequestBodyResponseBody
+  extends ApiWithQueryParametersRequestBody,
+    ResponseBody {}
+/**
+ * HTTP with PathVariables, QueryParameters, RequestBody, ResponseBody
+ */
+export interface ApiWithPathVariablesQueryParametersRequestBodyResponseBody
+  extends ApiWithPathVariablesQueryParametersRequestBody,
+    ResponseBody {}
+
+/** 接口定义 */
+export type Api =
+  | ApiBase
+  | ApiWithPathVariables
+  | ApiWithQueryParameters
+  | ApiWithPathVariablesQueryParameters
+  | ApiWithRequestBody
+  | ApiWithPathVariablesRequestBody
+  | ApiWithQueryParametersRequestBody
+  | ApiWithPathVariablesQueryParametersRequestBody
+  | ApiWithResponseBody
+  | ApiWithPathVariablesResponseBody
+  | ApiWithQueryParametersResponseBody
+  | ApiWithRequestBodyResponseBody
+  | ApiWithPathVariablesQueryParametersResponseBody
+  | ApiWithPathVariablesRequestBodyResponseBody
+  | ApiWithQueryParametersRequestBodyResponseBody
+  | ApiWithPathVariablesQueryParametersRequestBodyResponseBody;
 /** 接口列表 */
 export type InterfaceList = Api[];
 
 /** 分类信息 */
 export interface Category {
   /** ID */
-  _id: number
+  _id: number;
   /** 分类名称 */
-  name: string
+  name: string;
   /** 分类备注 */
-  desc: string
+  desc: string;
   /** 分类接口列表 */
-  list: InterfaceList
+  list: InterfaceList;
   /** 创建时间（unix时间戳） */
-  add_time: number
+  add_time: number;
   /** 更新时间（unix时间戳） */
-  up_time: number
+  up_time: number;
 }
 
 /** 分类列表，对应数据导出的 json 内容 */
@@ -166,7 +282,7 @@ type MainConfig = {
    * default value: @/api/request
    */
   requestApiPath?: string;
-}
+};
 /**
  * 共享的配置。
  */
@@ -174,30 +290,32 @@ export interface Y2ApiConfig {
   /**
    * project name
    */
-  [key: string]: MainConfig & (
-      {
-        /**
-         * categories which will be gen
-         */
-        exclude?: Ids;
-      } | {
-        /**
-         * categories which will be gen
-         */
-        include?: Ids;
-      }
-  );
+  [key: string]: MainConfig &
+    (
+      | {
+          /**
+           * categories which will be gen
+           */
+          exclude?: Ids;
+        }
+      | {
+          /**
+           * categories which will be gen
+           */
+          include?: Ids;
+        }
+    );
 }
 
 export interface CLIArgs {
   /**
    * y2ts config path
    */
-	config: string;
-	/**
-	 * projects which will be gen
-	 */
-	filter?: string[];
+  config: string;
+  /**
+   * projects which will be gen
+   */
+  filter?: string[];
 }
 
 export type FullCategory = CategoryList[0] & {
@@ -224,10 +342,13 @@ export interface ParamDocs {
   docs: { name: string; desc: string }[];
 }
 
-export interface RequestQuery extends Pick<Required<JSONSchema4>, 'properties'>, ParamDocs {
+export interface RequestQuery
+  extends Pick<Required<JSONSchema4>, 'properties'>,
+    ParamDocs {
+  type: 'object';
   required: string[];
 }
-export type RequestPath = Omit<RequestQuery, 'required'>;
+export type RequestPath = RequestQuery;
 
 export interface RequestBodyParams {
   requestBody: JSONSchema4;
