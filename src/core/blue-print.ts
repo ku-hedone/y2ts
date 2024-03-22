@@ -29,7 +29,7 @@ class BluePrint {
       } as ParamsType<NonNullable<T>>;
     };
 
-  build(api: Api, baseUrl: string): BluePrintInstance {
+  private build(api: Api, baseUrl: string): BluePrintInstance {
     const Query = new QueryURL(api, baseUrl);
     const name = helper.genApiName(api.path);
     const method = helper.genMethod(api.method);
