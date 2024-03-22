@@ -1,5 +1,9 @@
-import { RequiredStatus } from "../../src/constant";
-import type { BodyType, OriginalPathVariable, OriginalRequestQuery } from '../../src/types';
+import { RequiredStatus } from '../../src/constant';
+import type {
+  BodyType,
+  OriginalPathVariable,
+  OriginalRequestQuery,
+} from '../../src/types';
 
 type PrimitiveType = {
   type: 'string' | 'number' | 'boolean';
@@ -38,7 +42,7 @@ const genRandomDescription = (
   probability: number,
 ): string | undefined => {
   return Math.random() < probability ? `${baseDesc}` : undefined;
-}
+};
 
 const ensureAtLeastOneUndefinedDesc = (
   params: OriginalRequestQuery[] | OriginalPathVariable[],
@@ -53,11 +57,13 @@ const ensureAtLeastOneUndefinedDesc = (
 
 const genQueryParameters = (
   params: URLFactoryOption['url']['query'],
-): {
-  req_query: OriginalRequestQuery[];
-} => {
-  const req_query: OriginalRequestQuery[] = [];
+):
+  | {
+      req_query: OriginalRequestQuery[];
+    }
+  | undefined => {
   if (params && params.count) {
+    const req_query: OriginalRequestQuery[] = [];
     let id = Date.now();
     for (let i = 0; i < params.count; i++) {
       req_query.push({
@@ -68,10 +74,10 @@ const genQueryParameters = (
       });
     }
     ensureAtLeastOneUndefinedDesc(req_query);
+    return {
+      req_query,
+    };
   }
-  return {
-    req_query,
-  };
 };
 
 const genPathVariables = (
@@ -94,7 +100,7 @@ const genPathVariables = (
 
 const genURL = (
   url: URLFactoryOption['url'],
-): { path: string; req_params: OriginalPathVariable[] } => {
+): { path: string; req_params?: OriginalPathVariable[] } => {
   const path: string[] = ['/mock/api'];
 
   // 生成路径参数字符串
@@ -104,11 +110,14 @@ const genURL = (
     req_params.forEach((param) => {
       path.push(`{${param.name}}`);
     });
+    return {
+      path: path.join('/'),
+      req_params,
+    };
   }
 
   return {
     path: path.join('/'),
-    req_params,
   };
 };
 
@@ -176,23 +185,36 @@ const genResponseBody = (
           fieldNames.push(fieldName);
         }
 
-        if (value.type === 'object') {
-          // Add more detailed handling if object has properties
-          properties[fieldName] = {
-            type: 'object',
-            properties: {}, // Should be expanded based on object's definition
-          };
-        } else if (value.type === 'array') {
-          // Add handling for array type, considering item types
-          properties[fieldName] = {
-            type: 'array',
-            items: {}, // Should be expanded based on array's item definition
-          };
-        } else {
-          // PrimitiveType
-          properties[fieldName] = {
-            type: value.type,
-          };
+        switch (value.type) {
+          case 'object': {
+            // Add more detailed handling if object has properties
+            properties[fieldName] = {
+              type: value.type,
+              properties: {}, // Should be expanded based on object's definition
+            };
+            break;
+          }
+          case 'array': {
+            // Add handling for array type, considering item types
+            properties[fieldName] = {
+              type: 'array',
+              items: {}, // Should be expanded based on array's item definition
+            };
+
+            break;
+          }
+          case 'boolean':
+          case 'number':
+          case 'string': {
+            // PrimitiveType
+            properties[fieldName] = {
+              type: value.type,
+            };
+            break;
+          }
+          default: {
+            break;
+          }
         }
       });
 
