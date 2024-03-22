@@ -15,9 +15,13 @@ describe('query url', () => {
   describe('when there are no parameters', () => {
     beforeAll(() => {
       api = createQueryURLConfig({
-        title: '无参数的get请求',
+        title: 'when there are no parameters',
         method: 'GET',
-        url: {},
+        url: {
+          params: {
+            count: 0
+          }
+        },
       });
       instance = new QueryURL(api, '/prefix');
     });
@@ -32,6 +36,7 @@ describe('query url', () => {
       clean();
     });
   });
+
   describe('when there are path parameters', () => {
     beforeAll(() => {
       api = createQueryURLConfig({
@@ -40,7 +45,7 @@ describe('query url', () => {
         url: {
           params: {
             count: 1,
-          },
+          }
         },
       });
       instance = new QueryURL(api, '/prefix');
@@ -57,6 +62,7 @@ describe('query url', () => {
       clean();
     });
   });
+
   describe('when there are query parameters', () => {
     beforeAll(() => {
       api = createQueryURLConfig({
@@ -91,16 +97,17 @@ describe('query url', () => {
       clean();
     });
   });
+
   describe('when there are partial query parameters', () => {
     beforeAll(() => {
       api = createQueryURLConfig({
-        title: '全部为非必填query参数的get请求',
+        title: 'when there are partial query parameters',
         method: 'GET',
         url: {
           query: {
             count: 3,
             required: 1,
-          },
+          }
         },
       });
       instance = new QueryURL(api, '/prefix');
@@ -111,6 +118,44 @@ describe('query url', () => {
 
     it('should not generate any path parameters', () => {
       expect(instance!.pathParams).toBeUndefined();
+    });
+    it('should define query parameters', () => {
+      expect(instance!.queryParams).toBeDefined();
+    });
+    it('query params object should have the correct type', () => {
+      expect(instance!.queryParams!.type).toBe('object');
+    });
+    it('query params required length should be one', () => {
+      expect(instance!.queryParams!.required).toHaveLength(1);
+    });
+    afterAll(() => {
+      clean();
+    });
+  });
+  describe('when there are both query parameters and query parameters', () => {
+    beforeAll(() => {
+      api = createQueryURLConfig({
+        title: 'when there are both query parameters and query parameters',
+        method: 'GET',
+        url: {
+          query: {
+            count: 3,
+            required: 1,
+          },
+          params: {
+            count: 2,
+          },
+        },
+      });
+      instance = new QueryURL(api, '/prefix');
+    });
+    it('should generate the correct URL', () => {
+      expect(instance!.url).toBe(
+        `/prefix/mock/api/${(api! as ApiWithPathVariables).req_params.map((i) => `{${i.name}}`).join('/')}`,
+      );
+    });
+    it('should not generate any path parameters', () => {
+      expect(instance!.pathParams).toBeDefined();
     });
     it('should define query parameters', () => {
       expect(instance!.queryParams).toBeDefined();
