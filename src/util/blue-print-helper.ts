@@ -57,14 +57,19 @@ export const typeName = (kind: string, name: string, method: string): string => 
   )}${kind}`;
 };
 
-export const genRequestBodyParams = (api: Api, method: string): JSONSchema4 | undefined => {
-  const { req_body_type, req_body_other } = api;
-  if (
-    req_body_type === 'json' &&
-    req_body_other &&
-    method.toLocaleLowerCase() !== 'get'
-  ) {
-    return JSON.parse(req_body_other);
+export const genRequestBodyParams = (
+  api: Api,
+  method: string,
+): JSONSchema4 | undefined => {
+  if ('req_body_type' in api) {
+    const { req_body_type, req_body_other } = api;
+    if (
+      req_body_type === 'json' &&
+      req_body_other &&
+      method.toLocaleLowerCase() !== 'get'
+    ) {
+      return JSON.parse(req_body_other);
+    }
   }
   // TODO more req_body_type support : form...
   return void 0;
@@ -74,14 +79,14 @@ export const genMethod = (method: string): string => {
   return upperCaseFirstWord(method.toLocaleLowerCase());
 };
 
-export const genResponse = ({
-  res_body_type,
-  res_body_is_json_schema,
-  res_body,
-}: Api): JSONSchema4 => {
-  if (res_body_type === 'json' && res_body_is_json_schema && res_body) {
-    const { title: _, ...json } = JSON.parse(res_body);
-    if ('properties' in json && json.properties.data) return json.properties.data;
+export const genResponse = (api: Api): JSONSchema4 => {
+  if ('res_body_type' in api) {
+    const { res_body_type, res_body_is_json_schema, res_body } = api;
+    if (res_body_type === 'json' && res_body_is_json_schema && res_body) {
+      const { title: _, ...json } = JSON.parse(res_body);
+      if ('properties' in json && json.properties.data) return json.properties.data;
+    }
   }
+
   return { type: 'null' };
 };
