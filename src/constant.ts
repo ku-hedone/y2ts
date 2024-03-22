@@ -1,4 +1,4 @@
-import type { JSONSchema4 } from "json-schema";
+import type { JSONSchema4 } from 'json-schema';
 
 export const EMPTY_RECORD_PLACEHOLDER = `@@EMPTY_RECORD@@`;
 
@@ -30,24 +30,6 @@ export enum RequiredStatus {
   true = '1',
 }
 
-/** 请求数据类型 */
-export enum RequestBodyType {
-  /** 查询字符串 */
-  query = 'query',
-  /** 表单 */
-  form = 'form',
-  /** JSON */
-  json = 'json',
-  /** 纯文本 */
-  text = 'text',
-  /** 文件 */
-  file = 'file',
-  /** 原始数据 */
-  raw = 'raw',
-  /** 无请求数据 */
-  none = 'none',
-}
-
 /** 请求路径参数类型 */
 export enum RequestParamType {
   /** 字符串 */
@@ -70,22 +52,6 @@ export enum RequestFormItemType {
   text = 'text',
   /** 文件 */
   file = 'file',
-}
-
-/** 返回数据类型 */
-export enum ResponseBodyType {
-  /** JSON */
-  json = 'json',
-  /** 纯文本 */
-  text = 'text',
-  /** XML */
-  xml = 'xml',
-  /** 原始数据 */
-  raw = 'raw',
-
-  // yapi 实际上返回的是 json，有另外的字段指示其是否是 json schema
-  /** JSON Schema */
-  // jsonSchema = 'json-schema',
 }
 
 /** 查询字符串数组格式化方式 */
