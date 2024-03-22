@@ -83,8 +83,12 @@ export const genResponse = (api: Api): JSONSchema4 => {
   if ('res_body_type' in api) {
     const { res_body_type, res_body_is_json_schema, res_body } = api;
     if (res_body_type === 'json' && res_body_is_json_schema && res_body) {
-      const { title: _, ...json } = JSON.parse(res_body);
-      if ('properties' in json && json.properties.data) return json.properties.data;
+      const { title: _, ...json } = JSON.parse(res_body) as JSONSchema4;
+      // TODO: deconstruction keyword get from config
+      if ('properties' in json && json.properties && 'data' in json.properties) {
+        return json.properties.data;
+      }
+      return json;
     }
   }
 
