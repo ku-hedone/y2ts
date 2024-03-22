@@ -1,5 +1,5 @@
 import { resolve } from 'path';
-import { accessSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { accessSync, mkdirSync, readFileSync } from 'fs';
 import { longestCommonPrefixCompare } from './shared';
 import Task from './core/task';
 import Streams from './core/stream';
@@ -63,11 +63,6 @@ export const main = async ({
         count++;
         console.log(`percent: ${count}/${n}`);
       };
-
-      writeFileSync(`${id}.json`, JSON.stringify(YAPIs.reduce((p, l) => {
-        p[l._id] = l;
-        return p;
-      }, {} as any), null, 4));
 
       for (let i = 0; i < n; i++) {
         const api = YAPIs[i];
