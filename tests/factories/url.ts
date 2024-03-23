@@ -1,9 +1,4 @@
-import { RequiredStatus } from '../../src/constant';
-import type {
-  BodyType,
-  OriginalPathVariable,
-  OriginalRequestQuery,
-} from '../../src/types';
+import type { BodyType, PathVariable, RequestQuery } from '../../src/types/api';
 
 type PrimitiveType = {
   type: 'string' | 'number' | 'boolean';
@@ -45,7 +40,7 @@ const genRandomDescription = (
 };
 
 const ensureAtLeastOneUndefinedDesc = (
-  params: OriginalRequestQuery[] | OriginalPathVariable[],
+  params: RequestQuery[] | PathVariable[],
 ) => {
   const allHaveDesc = params.every((param) => param.desc !== undefined);
   if (allHaveDesc) {
@@ -59,15 +54,15 @@ const genQueryParameters = (
   params: URLFactoryOption['url']['query'],
 ):
   | {
-      req_query: OriginalRequestQuery[];
+      req_query: RequestQuery[];
     }
   | undefined => {
   if (params && params.count) {
-    const req_query: OriginalRequestQuery[] = [];
+    const req_query: RequestQuery[] = [];
     let id = Date.now();
     for (let i = 0; i < params.count; i++) {
       req_query.push({
-        required: i < (params.required || 0) ? RequiredStatus.true : RequiredStatus.false,
+        required: i < (params.required || 0) ? "1" : "0",
         _id: `${id++}${i.toString().padStart(3, '0')}`,
         name: `param${i}`,
         desc: genRandomDescription(`参数${i}`, 0.5),
@@ -80,10 +75,8 @@ const genQueryParameters = (
   }
 };
 
-const genPathVariables = (
-  params: URLFactoryOption['url']['params'],
-): OriginalPathVariable[] => {
-  const req_params: OriginalPathVariable[] = [];
+const genPathVariables = (params: URLFactoryOption['url']['params']): PathVariable[] => {
+  const req_params: PathVariable[] = [];
   if (params && params.count) {
     let id = Date.now();
     for (let i = 0; i < params.count; i++) {
@@ -100,7 +93,7 @@ const genPathVariables = (
 
 const genURL = (
   url: URLFactoryOption['url'],
-): { path: string; req_params?: OriginalPathVariable[] } => {
+): { path: string; req_params?: PathVariable[] } => {
   const path: string[] = ['/mock/api'];
 
   // 生成路径参数字符串

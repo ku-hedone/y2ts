@@ -22,14 +22,6 @@ export enum Method {
   PATCH = 'PATCH',
 }
 
-/** 是否必需 */
-export enum RequiredStatus {
-  /** 不必需 */
-  false = '0',
-  /** 必需 */
-  true = '1',
-}
-
 /** 请求路径参数类型 */
 export enum RequestParamType {
   /** 字符串 */

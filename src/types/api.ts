@@ -19,12 +19,12 @@ interface RequestHeader extends AdditionalDescription {
   required: Status;
 }
 
-interface PathVariable extends AdditionalDescription {
+export interface PathVariable extends AdditionalDescription {
   _id: string;
   name: string;
 }
 
-interface RequestQuery extends AdditionalDescription {
+export interface RequestQuery extends AdditionalDescription {
   _id: string;
   name: string;
   required: Status;

@@ -1,13 +1,8 @@
 import { expect, describe, it, beforeAll, afterAll } from 'vitest';
 import BluePrint from '../src/core/blue-print';
 import createQueryURLConfig from './factories/url';
-import type {
-  Api,
-  BluePrintInstance,
-  PathBluePrint,
-  QueryAndPathBluePrint,
-  QueryBluePrint,
-} from '../src/types';
+import type { BluePrintInstance, PathBluePrint, QueryAndPathBluePrint, QueryBluePrint } from '../src/types/instance';
+import type { Api } from '../src/types/api';
 
 describe('blue print', () => {
   let instance: BluePrintInstance | undefined;

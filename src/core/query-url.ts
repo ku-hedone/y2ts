@@ -1,7 +1,6 @@
-import { RequiredStatus } from '../constant';
 import type { JSONSchema4 } from 'json-schema';
 import type { ParamDocs, PathVariables, QueryParameters } from '../types/instance';
-import type { Api, ApiWithPathVariables, ApiWithQueryParameters } from '../types/api';
+import type { Api, PathVariable, RequestQuery } from '../types/api';
 
 class QueryURL {
   url: string;
@@ -19,12 +18,12 @@ class QueryURL {
   }
 
   private generator(
-    params: ApiWithPathVariables['req_params'] | ApiWithQueryParameters['req_query'],
+    params: PathVariable[] | RequestQuery[],
   ): QueryParameters | undefined {
     const docs: ParamDocs['docs'] = [];
     const required: JSONSchema4['required'] = [];
     const properties = {} as Required<JSONSchema4>['properties'];
-    params.forEach((i) => {
+    params.forEach((i: PathVariable | RequestQuery) => {
       const { name, desc = '' } = i;
       docs.push({ name, desc });
       properties[name] = {
@@ -33,7 +32,7 @@ class QueryURL {
       };
       if ('required' in i) {
         // current params type is req_query
-        if (i.required === RequiredStatus.true) {
+        if (i.required === "1") {
           required.push(name);
         }
       } else {

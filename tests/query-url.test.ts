@@ -1,7 +1,7 @@
 import { expect, describe, it, beforeAll, afterAll } from 'vitest';
 import QueryURL from '../src/core/query-url';
 import createQueryURLConfig from './factories/url';
-import type { Api, ApiWithPathVariables } from '../src/types';
+import type { Api, ApiWithPathVariables } from '../src/types/api';
 
 describe('query url', () => {
   let instance: QueryURL | undefined;
@@ -30,7 +30,7 @@ describe('query url', () => {
     });
     it('should not generate any query or path parameters', () => {
       expect(instance!.queryParams).toBeUndefined();
-      expect(instance!.pathParams).toBeUndefined();
+      expect(instance!.pathVariables).toBeUndefined();
     });
     afterAll(() => {
       clean();
@@ -82,7 +82,7 @@ describe('query url', () => {
     });
 
     it('should not generate any path parameters', () => {
-      expect(instance!.pathParams).toBeUndefined();
+      expect(instance!.pathVariables).toBeUndefined();
     });
     it('should define query parameters', () => {
       expect(instance!.queryParams).toBeDefined();
@@ -117,7 +117,7 @@ describe('query url', () => {
     });
 
     it('should not generate any path parameters', () => {
-      expect(instance!.pathParams).toBeUndefined();
+      expect(instance!.pathVariables).toBeUndefined();
     });
     it('should define query parameters', () => {
       expect(instance!.queryParams).toBeDefined();
@@ -155,7 +155,7 @@ describe('query url', () => {
       );
     });
     it('should not generate any path parameters', () => {
-      expect(instance!.pathParams).toBeDefined();
+      expect(instance!.pathVariables).toBeDefined();
     });
     it('should define query parameters', () => {
       expect(instance!.queryParams).toBeDefined();
