@@ -5,8 +5,33 @@ import Task from './core/task';
 import Streams from './core/stream';
 import Compiler from './core/complier';
 import Processor from './core/processor';
-import { getProjectByConfig, getCategoryListByProject } from './core/info';
-import type { CLIArgs, Y2ApiConfig } from './types';
+import { getProject, getCategoryList } from './core/info';
+import type { CLIArgs, Y2ApiConfig } from './types/config';
+import type { Category } from './types/category';
+
+const filter = (
+  categories: Map<number, Category>,
+  {
+    exclude = [],
+    include = [],
+  }: {
+    exclude?: string[] | number[];
+    include?: string[] | number[];
+  },
+) => {
+  const excludeSet = new Set(exclude.map((i) => +i));
+  const includeSet = new Set(include.map((i) => +i));
+  categories.forEach((_, id) => {
+    if (exclude && excludeSet.has(id)) {
+      console.log("ignored category's {id} is", id);
+      categories.delete(id);
+    }
+    if (include && !includeSet.has(id)) {
+      console.log("ignored category's {id} is", id);
+      categories.delete(id);
+    }
+  });
+};
 
 export const main = async ({
   host,
@@ -22,8 +47,9 @@ export const main = async ({
   requestApiPath: string;
 }) => {
   const processor = new Processor();
-  const categoriesBase = await getProjectByConfig([{ host, token }]);
-  const categoriesApis = await getCategoryListByProject(categoriesBase);
+  const [categoriesBase, base] = await getProject({ host, token });
+  filter(categoriesBase, { exclude, include });
+  const categories = await getCategoryList(categoriesBase, { host, token });
   const folderPath = resolve(process.cwd(), './src', './api');
   try {
     accessSync(folderPath);
@@ -32,18 +58,9 @@ export const main = async ({
     mkdirSync(folderPath);
   }
   try {
-    const excludeSet = new Set((exclude || []).map((i) => +i));
-    const includeSet = new Set((include || []).map((i) => +i));
-    for (const [id, YAPIs] of categoriesApis) {
-      if (exclude && excludeSet.has(id)) {
-        continue;
-      }
-      if (include && !includeSet.has(id)) {
-        continue;
-      }
-      console.log('api record start', id);
+    for (const [id, YAPIs] of categories) {
+      console.group('generator category {id} ->', id);
       const category = categoriesBase.get(id);
-      const basePath = category ? category.base : '';
       let LCP: string | undefined = void 0;
       let compare: string | null = null;
       const apis: string[] = [];
@@ -73,7 +90,7 @@ export const main = async ({
             LCP = compare = longestCommonPrefixCompare(compare, api.path);
           }
         }
-        const task = new Task(api, basePath);
+        const task = new Task(api, base);
         apis.push(task.url);
         tasks.push(task.run(files, complier, processor, callback));
       }
@@ -118,7 +135,7 @@ export const main = async ({
       );
 
       console.table(apis);
-      console.log('api record end', id);
+      console.groupEnd();
     }
   } catch (e) {
     console.error('err:', e);
