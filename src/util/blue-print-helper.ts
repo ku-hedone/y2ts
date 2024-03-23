@@ -1,6 +1,6 @@
 import { split, upperCaseFirstWord } from '../shared';
 import type { JSONSchema4 } from 'json-schema';
-import type { Api } from '../types';
+import type { Api } from '../types/api';
 
 const delimiters = new Set(['-', '_']);
 

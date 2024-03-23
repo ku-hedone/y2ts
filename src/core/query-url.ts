@@ -1,16 +1,17 @@
 import { RequiredStatus } from '../constant';
 import type { JSONSchema4 } from 'json-schema';
-import type { Api, ApiWithPathVariables, ApiWithQueryParameters, ParamDocs, RequestPath, RequestQuery } from '../types';
+import type { ParamDocs, PathVariables, QueryParameters } from '../types/instance';
+import type { Api, ApiWithPathVariables, ApiWithQueryParameters } from '../types/api';
 
 class QueryURL {
   url: string;
-  queryParams: RequestQuery | undefined;
-  pathParams: RequestPath | undefined;
+  queryParams: QueryParameters | undefined;
+  pathVariables: PathVariables | undefined;
 
   constructor(api: Api, baseUrl: string) {
     this.url = this.genURL(api, baseUrl);
     this.queryParams = this.genQueryParams(api);
-    this.pathParams = this.genPathParams(api);
+    this.pathVariables = this.genPathParams(api);
   }
 
   private genURL({ path }: Api, prefix: string): string {
@@ -19,7 +20,7 @@ class QueryURL {
 
   private generator(
     params: ApiWithPathVariables['req_params'] | ApiWithQueryParameters['req_query'],
-  ): RequestQuery | undefined {
+  ): QueryParameters | undefined {
     const docs: ParamDocs['docs'] = [];
     const required: JSONSchema4['required'] = [];
     const properties = {} as Required<JSONSchema4>['properties'];
@@ -55,7 +56,7 @@ class QueryURL {
     }
   }
 
-  private genPathParams(api: Api): QueryURL['pathParams'] {
+  private genPathParams(api: Api): QueryURL['pathVariables'] {
     if ('req_params' in api && api.req_params.length) {
       return this.generator(api.req_params);
     }

@@ -2,10 +2,11 @@ import BluePrint from './blue-print';
 import Compiler from './complier';
 import Processor from './processor';
 import Streams from './stream';
-import type { Api, BluePrintInstance, ParamsType } from '../types';
+import type { BluePrintInstance, ParamsType } from '../types/instance';
 import type { JSONSchema4 } from 'json-schema';
+import type { Api } from '../types/api';
 
-const STATIC_KEY = ['query', 'path', 'request', 'response'] as const;
+const TASK_TYPES = ['query', 'path', 'request', 'response'] as const;
 class Task {
   instance: BluePrintInstance;
   constructor(api: Api, basePath: string) {
@@ -20,9 +21,9 @@ class Task {
     try {
       const tasks: Promise<{ code: string; name: string } | void>[] = [];
       // gen complier tasks
-      STATIC_KEY.forEach((v) => {
+      TASK_TYPES.forEach((task) => {
         const value = this.instance[
-          v as keyof BluePrintInstance
+          task as keyof BluePrintInstance
         ] as ParamsType<JSONSchema4>;
         if (typeof value !== 'undefined') {
           tasks.push(complier.genTypings(processor.process(value.type), value.name));

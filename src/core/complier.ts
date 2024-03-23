@@ -3,7 +3,7 @@ import { definitions } from '../constant';
 import { dedent, upperCaseFirstWord, flow } from '../shared';
 import { replaceEmptyPlaceHolder, replaceMapKey } from '../util/replace';
 import type { JSONSchema4 } from 'json-schema';
-import type { BluePrintInstance } from '../types';
+import type { BluePrintInstance } from '../types/instance';
 
 const STATIC_CONFIG_CODE = 'config?: AxiosRequestConfig';
 

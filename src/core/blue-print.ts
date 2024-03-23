@@ -1,7 +1,6 @@
 import QueryURL from './query-url';
 import * as helper from '../util/blue-print-helper';
 import type {
-  Api,
   BaseBluePrint,
   BluePrintInstance,
   NormalBluePrint,
@@ -9,7 +8,8 @@ import type {
   PathBluePrint,
   QueryAndPathBluePrint,
   QueryBluePrint,
-} from '../types';
+} from '../types/instance';
+import type { Api } from '../types/api';
 
 class BluePrint {
   instance: BluePrintInstance;
@@ -35,7 +35,7 @@ class BluePrint {
     const method = helper.genMethod(api.method);
     const genType = this.genParamsType(name, method);
     const query = genType('Query', Query.queryParams);
-    const path = genType('Path', Query.pathParams);
+    const path = genType('Path', Query.pathVariables);
     const instance: Omit<BaseBluePrint, 'type'> = {
       name,
       url: Query.url,
