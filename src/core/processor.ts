@@ -6,22 +6,22 @@ type Type = JSONSchema4['type'];
 type Properties = JSONSchema4['properties'];
 type NextProperties = Required<JSONSchema4>['properties'];
 
+const Mapping: Map<string, JSONSchema4TypeName> = new Map([
+  ['byte', 'number'],
+  ['short', 'number'],
+  ['int', 'number'],
+  ['long', 'number'],
+  ['float', 'number'],
+  ['double', 'number'],
+  ['bigdecimal', 'number'],
+  ['char', 'string'],
+  ['void', 'null'],
+]);
+
 class Processor {
   private book: Map<RefName, JSONSchema4>;
-  private mapping: Map<string, JSONSchema4TypeName>;
   constructor() {
     this.book = new Map();
-    this.mapping = new Map([
-      ['byte', 'number'],
-      ['short', 'number'],
-      ['int', 'number'],
-      ['long', 'number'],
-      ['float', 'number'],
-      ['double', 'number'],
-      ['bigdecimal', 'number'],
-      ['char', 'string'],
-      ['void', 'null'],
-    ]);
   }
 
   /**
@@ -31,16 +31,16 @@ class Processor {
    * @param type JSONSchema 返回 的 类型
    * @returns
    */
-  processType = (type: Type) => {
+  private processType = (type: Type) => {
     if (type) {
       const types: JSONSchema4TypeName[] = [];
       if (Array.isArray(type)) {
         type.forEach((item) => {
-          types.push(this.mapping.get(item.toLowerCase()) || item);
+          types.push(Mapping.get(item.toLowerCase()) || item);
         });
         return types;
       } else {
-        return this.mapping.get(type.toLowerCase()) || type;
+        return Mapping.get(type.toLowerCase()) || type;
       }
     }
     return 'null';
@@ -60,7 +60,7 @@ class Processor {
     return false;
   };
 
-  clearTitle = (schema: JSONSchema4, isRoot: boolean) => {
+  private clearTitle = (schema: JSONSchema4, isRoot: boolean) => {
     if (isRoot) {
       schema.title = undefined;
     } else {
@@ -108,21 +108,21 @@ class Processor {
     }
   };
 
-  private processRequired = (required: JSONSchema4['required']) => {
-    if (required && Array.isArray(required)) {
-      const nextRequired: JSONSchema4['required'] = [];
-      required.forEach((require) => {
-        nextRequired.push(require.trim());
-      });
+  // private processRequired = (required: JSONSchema4['required']) => {
+  //   if (required && Array.isArray(required)) {
+  //     const nextRequired: JSONSchema4['required'] = [];
+  //     required.forEach((require) => {
+  //       nextRequired.push(require.trim());
+  //     });
 
-      return nextRequired;
-    }
-    return required;
-  };
+  //     return nextRequired;
+  //   }
+  //   return required;
+  // };
 
-  private processUseExternal = (schema: JSONSchema4) => {
-    return schema.title ? this.book.has(schema.title) : false;
-  };
+  // private processUseExternal = (schema: JSONSchema4) => {
+  //   return schema.title ? this.book.has(schema.title) : false;
+  // };
 
   private processNull(_: JSONSchema4): JSONSchema4 {
     return {
