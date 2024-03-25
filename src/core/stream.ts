@@ -9,6 +9,7 @@ import {
 import { rename } from 'node:fs/promises';
 import { PassThrough } from 'node:stream';
 import { resolve } from 'node:path';
+import * as helper from '../util/stream-helper';
 
 type WriteStreamType = 'codes' | 'typings' | 'imports';
 
@@ -60,12 +61,14 @@ class Streams {
 
   private rm(paths: WriteStreamType[]) {
     paths.forEach((path) => {
+      const stream = this[path];
       try {
-        if (this[path].bytesWritten === 0) {
-          this[path].close();
-          this[path].on('finish', () => {
-            rmSync(this.names[path]);
-          })          
+        if (stream.bytesWritten === 0 || typeof stream.bytesWritten === 'undefined') {
+          stream.end(() => {
+            if (existsSync(this.names[path])) {
+              rmSync(this.names[path]);
+            }
+          });
         } else {
           if (existsSync(this.names[path])) {
             rmSync(this.names[path]);
@@ -94,23 +97,15 @@ class Streams {
     });
   }
 
-  private async writeImports(apisFile: WriteStream, method: string[]) {
-    const methods = method.map((i) => `${i.toLocaleLowerCase()}Request`);
-    const methodsCode =
-      methods.length === 1
-        ? `\t${methods[0]}\n`
-        : methods.reduce((p, l) => {
-          p += `\t${l},\n`;
-          return p;
-        }, '');
+  private async writeImports(apisFile: WriteStream, methods: string[]) {
     await this.write(
-      `import {\n${methodsCode}} from '${this.api}';\nimport type { AxiosRequestConfig } from 'axios';\n`,
+      helper.generatorImportCode({ api: this.api, methods }),
       apisFile,
     );
   }
 
   async finished(name: string, method: string[], hoistingCode?: string) {
-    if (this.codes.bytesWritten !== 0) {
+    if (typeof this.codes.bytesWritten !== 'undefined' && this.codes.bytesWritten !== 0) {
       if (hoistingCode) {
         const typingFile = createWriteStream(resolve(this.cwd, `${name}.type.ts`));
         await this.write(hoistingCode, typingFile);
@@ -139,8 +134,10 @@ class Streams {
     this.destroy();
   }
 
+  /**
+   * 删除临时文件
+   */
   destroy() {
-    // 删除 临时文件
     this.rm(['codes', 'typings', 'imports']);
   }
 }
